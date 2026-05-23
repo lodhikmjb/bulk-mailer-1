@@ -1,41 +1,95 @@
-from flask import Flask, request, redirect, url_for
-
+from flask import Flask, request
 import smtplib
 
 app = Flask(__name__)
 
-# ---------------- LOGIN PAGE ----------------
-@app.route("/", methods=["GET"])
-def login():
+# ---------------- HOME PAGE ----------------
+@app.route("/")
+def home():
     return '''
-    <h2>🔐 Login</h2>
-    <form action="/mail" method="get">
-        <input name="email" placeholder="Your Gmail"><br><br>
-        <input name="password" placeholder="App Password"><br><br>
-        <button type="submit">Login</button>
-    </form>
-    '''
+    <html>
 
-# ---------------- MAIL PAGE ----------------
-@app.route("/mail", methods=["GET"])
-def mail_page():
-    email = request.args.get("email")
-    password = request.args.get("password")
+    <head>
+        <title>Bulk Mailer Dashboard</title>
 
-    return f'''
-    <h2>📧 Bulk Mail Sender</h2>
+        <style>
 
-    <form action="/send" method="post">
-        <input type="hidden" name="email" value="{email}">
-        <input type="hidden" name="password" value="{password}">
+            body{
+                background:#f4f4f4;
+                font-family:Arial;
+                padding:40px;
+            }
 
-        <input name="to" placeholder="Emails (comma separated)" style="width:300px"><br><br>
-        <input name="subject" placeholder="Subject" style="width:300px"><br><br>
+            .box{
+                background:white;
+                max-width:600px;
+                margin:auto;
+                padding:30px;
+                border-radius:10px;
+                box-shadow:0px 0px 10px rgba(0,0,0,0.1);
+            }
 
-        <textarea name="message" placeholder="Message" style="width:300px;height:120px"></textarea><br><br>
+            h2{
+                text-align:center;
+            }
 
-        <button type="submit">🚀 Send Bulk Mail</button>
-    </form>
+            input, textarea{
+                width:100%;
+                padding:12px;
+                margin-top:10px;
+                border:1px solid #ccc;
+                border-radius:5px;
+            }
+
+            button{
+                width:100%;
+                padding:12px;
+                margin-top:20px;
+                background:#007bff;
+                color:white;
+                border:none;
+                border-radius:5px;
+                font-size:16px;
+                cursor:pointer;
+            }
+
+            button:hover{
+                background:#0056b3;
+            }
+
+        </style>
+
+    </head>
+
+    <body>
+
+        <div class="box">
+
+            <h2>📧 Bulk Mail Dashboard</h2>
+
+            <form action="/send" method="post">
+
+                <input type="text" name="name" placeholder="First Name">
+
+                <input type="email" name="email" placeholder="Send From (Your Gmail)">
+
+                <input type="password" name="password" placeholder="App Password">
+
+                <input type="text" name="subject" placeholder="Subject">
+
+                <textarea name="message" rows="8" placeholder="Body"></textarea>
+
+                <textarea name="to" rows="5" placeholder="Mails (comma separated)"></textarea>
+
+                <button type="submit">🚀 Send Emails</button>
+
+            </form>
+
+        </div>
+
+    </body>
+
+    </html>
     '''
 
 # ---------------- SEND MAIL ----------------
@@ -45,24 +99,28 @@ def send():
     email = request.form["email"]
     password = request.form["password"]
 
-    to_list = request.form["to"].split(",")
     subject = request.form["subject"]
     message = request.form["message"]
 
+    to_list = request.form["to"].split(",")
+
     server = smtplib.SMTP("smtp.gmail.com", 587)
+
     server.starttls()
+
     server.login(email, password)
 
     for to in to_list:
-        to = to.strip()
-        text = f"Subject: {subject}\n\n{message}"
-        server.sendmail(email, to, text)
+
+        text = f"Subject: {subject}\\n\\n{message}"
+
+        server.sendmail(email, to.strip(), text)
 
     server.quit()
 
-    return "<h2>✅ All Emails Sent Successfully!</h2>"
+    return "<h2>✅ Emails Sent Successfully</h2>"
 
-# ---------------- RUN APP ----------------
+# ---------------- RUN ----------------
 if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 10000))
