@@ -10,7 +10,7 @@ def home():
     <html>
 
     <head>
-        <title>Bulk Mailer Dashboard</title>
+        <title>Bulk Mail Dashboard</title>
 
         <style>
 
@@ -96,29 +96,55 @@ def home():
 @app.route("/send", methods=["POST"])
 def send():
 
-    email = request.form["email"]
-    password = request.form["password"]
+    try:
 
-    subject = request.form["subject"]
-    message = request.form["message"]
+        email = request.form["email"]
+        password = request.form["password"]
 
-    to_list = request.form["to"].split(",")
+        subject = request.form["subject"]
+        message = request.form["message"]
 
-    server = smtplib.SMTP("smtp.gmail.com", 587)
+        to_list = request.form["to"].split(",")
 
-    server.starttls()
+        server = smtplib.SMTP("smtp.gmail.com", 587)
 
-    server.login(email, password)
+        server.starttls()
 
-    for to in to_list:
+        server.login(email, password)
 
-        text = f"Subject: {subject}\\n\\n{message}"
+        for to in to_list:
 
-        server.sendmail(email, to.strip(), text)
+            text = f"Subject: {subject}\\n\\n{message}"
 
-    server.quit()
+            server.sendmail(email, to.strip(), text)
 
-    return "<h2>✅ Emails Sent Successfully</h2>"
+        server.quit()
+
+        return '''
+
+        <script>
+
+        alert("✅ Emails Sent Successfully");
+
+        window.location.href="/";
+
+        </script>
+
+        '''
+
+    except Exception as e:
+
+        return '''
+
+        <script>
+
+        alert("❌ Failed To Send Mail\\n\\nCheck Gmail or App Password");
+
+        window.location.href="/";
+
+        </script>
+
+        '''
 
 # ---------------- RUN ----------------
 if __name__ == "__main__":
