@@ -114,14 +114,13 @@ def send():
 
         for to in to_list:
 
-            text = f"Subject: {subject}\\n\\n{message}"
+            text = f"Subject: {subject}\n\n{message}"
 
             server.sendmail(email, to.strip(), text)
 
         server.quit()
 
-        return '''
-
+        return """
         <script>
 
         alert("✅ Emails Sent Successfully");
@@ -129,22 +128,19 @@ def send():
         window.location.href="/";
 
         </script>
-
-        '''
+        """
 
     except Exception as e:
 
-        return '''
-
+        return f"""
         <script>
 
-        alert("❌ Failed To Send Mail\\n\\nCheck Gmail or App Password");
+        alert("❌ Failed To Send Mail\\n\\n{str(e)}");
 
         window.location.href="/";
 
         </script>
-
-        '''
+        """
 
 # ---------------- RUN ----------------
 if __name__ == "__main__":
